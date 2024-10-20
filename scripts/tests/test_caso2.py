@@ -7,7 +7,7 @@ import os
 # Adiciona o caminho da pasta 'scripts' ao sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
-from scripts.caso2.consulta import calcular_ticket_medio
+from scripts.caso2.ticket_medio import calcular_ticket_medio
 
 class TestCalcularTicketMedio(unittest.TestCase):
 

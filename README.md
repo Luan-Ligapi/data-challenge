@@ -1,168 +1,185 @@
-### Would you like to work with us? Apply [here](https://looqbox.gupy.io/)!
+# Desafio de Dados Looqbox - Visão Geral da Solução
 
-# Looqbox Data Challenge
-![Looqbox](https://github.com/looqbox/data-challenge/blob/master/logo.png)
+## Visão Geral do Desafio
 
-## Accessing the database
-You will need to access our MySQL database for this challenge. The database credentials will be sent to you by e-mail.
+A tarefa era analisar e manipular dados do banco de dados do desafio Looqbox. O desafio foi dividido em várias partes, onde respondemos a várias perguntas usando consultas SQL e scripts Python. As soluções envolveram consultar o banco de dados, calcular métricas-chave e visualizar os dados.
 
-## Challenge
-### Tables descriptions (you can click on them to see the columns on each table)
- <details>
-  <summary><b> DATA_PRODUCT: PRODUCT INFO</b></summary>
+### As Três Tarefas Principais:
 
-| COLUMN NAME  | COLUMN DESCRIPTION                                 |
-|--------------|----------------------------------------------------|
-| PRODUCT_COD  | PRODUCT CODE                                       |
-| PRODUCT_NAME | PRODUCT FULL NAME                                  |
-| PRODUCT_VAL  | PRODUCT SALES VALUE                                |
-| DEP_NAME     | NAME OF THE DEPARTMENT RESPONSIBLE FOR THE PRODUCT |
-| DEP_COD      | CODE OF THE DEPARTMENT RESPONSIBLE FOR THE PRODUCT |
-| SECTION_NAME | NAME OF THE SECTION WHERE THE PRODUCT IS           |
-| SECTION_COD  | CODE OF THE SECTION WHERE THE PRODUCT IS           |
+1. **Consultas SQL**:
+- Recuperar os 10 produtos mais caros da empresa.
+- Identificar as seções nos departamentos 'BEBIDAS' e 'PADARIA'.
+- Calcular as vendas totais para cada área de negócios no primeiro trimestre de 2019.
 
- </details>
-  
- <details>
-  <summary><b> DATA_PRODUCT_SALES: PRODUCT SALES</b></summary>
+2. **Função Python para consultar dados dinamicamente**:
+Desenvolvemos uma função Python, `retrieve_data`, que consulta dinamicamente o banco de dados com base em três parâmetros de entrada:
+- Código do produto (inteiro)
+- Código da loja (inteiro)
+- Intervalo de datas (lista de strings semelhantes a ISO)
 
-| COLUMN NAME  | COLUMN DESCRIPTION                                 |
-|--------------|----------------------------------------------------|
-| STORE_CODE   | STORE CODE                                         |
-| PRODUCT_CODE | PRODUCT CODE                                       |
-| DATE         | SALES DATE                                         |
-| SALES_VALUE  | SALES VALUES                                       |
-| SALES_QTY    | SALES QUANTITY                                     |
+3. **Ticket Médio**:
+Usando a duas querys bases e um tratamento de dados cheguei ao retorno esperado
 
-  
- </details>
- <details>
-  <summary><b> DATA_STORE_CAD: STORE INFO</b></summary>
+4. **Visualização de dados**:
+Usando a tabela IMDB_movies, criei um gráfico de dispersão que ilustra a relação entre a classificação de um filme e o número de votos que ele recebeu.
 
-| COLUMN NAME  | COLUMN DESCRIPTION                                 |
-|--------------|----------------------------------------------------|
-| STORE_CODE   | STORE CODE                                         |
-| STORE_NAME   | STORE NAME                                         |
-| START_DATE   | SHOP OPENING DATE                                  |
-| END_DATA     | SHOP CLOSING DATE                                  |
-| BUSINESS_NAME| NAMES OF BUSINESS AREA RESPONSIBLE FOR THE SHOP    |
-| BUSINESS_CODE| CODE OF BUSINESS AREA RESPONSIBLE FOR THE SHOP     |
+---
+## Análise da solução
 
- </details>
- <details>
-  <summary><b> DATA_STORE_SALES: SALES PER STORE</b></summary>
+### 1. Consultas SQL
 
-| COLUMN NAME  | COLUMN DESCRIPTION                                 |
-|--------------|----------------------------------------------------|
-| STORE_CODE   | STORE CODE                                         |
-| DATE         | COMMERCIAL DATE                                    |
-| SALES_VALUE  | TOTAL VALUE OF SALES IN THAT DATE                  |
-| SALES_QTY    | TOTAL QUANTITY OF SALES IN THAT DATE               |
-
- </details>
-
-### SQL test
-After accessing our database, create queries using the schema **looqbox_challenge** to answer the following questions:
-
-1) What are the 10 most expensive products in the company?
-2) What sections do the 'BEBIDAS' and 'PADARIA' departments have?
-3) What was the total sale of products (in $) of each Business Area in the first quarter of 2019?
-
-### Cases
-#### 1) The Dev Team was tired of developing the same old queries just varying the filters accordingly to their boss demands.
-As a new member of the crew, your mission now is to create a dynamic function in Python, on the most flexible of ways, to produce queries and retrieve a dataframe based on three parameters:
-
-- product_code: integer
-
-- store_code: integer
-
-- date: list of ISO-like strings
-
-- Date e.g.
-  - ['2019-01-01', '2019-01-31']
-
-It should look like this
-my_data = retrieve_data(product_code, store_code, date)
-
-Make your team proud!
-
-Extra instructions:
-- Retrieve all columns from table data_product_sales;
-- Imagine people from other teams will also utilize this function!
-
-#### 2) A brand new client sent you two ready-to-go queries. Those are listed below:
-
-Query 1:
-
+#### Consulta 1: 10 produtos mais caros
+```sql
+SELECT PRODUCT_NAME, PRODUCT_VAL
+FROM data_product
+ORDER BY PRODUCT_VAL DESC
+LIMIT 1;
 ```
-SELECT
-      STORE_CODE,
-      STORE_NAME,
-      START_DATE,
-      END_DATE,
-      BUSINESS_NAME,
-      BUSINESS_CODE
-FROM data_store_cad
-```
-Query 2:
+Esta consulta retorna o produto com o maior valor (`PRODUCT_VAL`).
 
+#### Consulta 2: Seções nos departamentos 'BEBIDAS' e 'PADARIA'
+```sql
+SELECT DISTINCT SECTION_NAME
+FROM data_product
+WHERE DEP_NAME IN ('BEBIDAS', 'PADARIA');
 ```
-SELECT
-        STORE_CODE,
-        DATE,
-        SALES_VALUE,
-        SALES_QTY
+Esta consulta recupera todas as seções distintas nos departamentos 'BEBIDAS' e 'PADARIA'.
+
+#### Consulta 3: Vendas totais no primeiro trimestre de 2019
+```sql
+SELECT BUSINESS_NAME, SUM(SALES_VALUE) AS total_sales
 FROM data_store_sales
-WHERE DATE BETWEEN '2019-01-01' AND '2019-12-31'
+JOIN data_store_cad USING (STORE_CODE)
+WHERE DATE BETWEEN '2019-01-01' AND '2019-03-31'
+GROUP BY BUSINESS_NAME;
 ```
-In addition, he gave you this set of instructions:
+Esta consulta calcula as vendas totais para cada área de negócios no primeiro trimestre de 2019.
 
-- Use the queries as they are (do not modify them or create a new one);
+### 2. Função Python: `retrieve_data`
 
-- Please filter the period between this given range: 
-  - ['2019-10-01','2019-12-31']
+Esta função foi projetada para fazer consultas flexíveis ao banco de dados usando três parâmetros: código do produto, código da loja e um intervalo de datas. Abaixo está a implementação completa:
+
+```python
+def retrieve_data(product_code, store_code, date_range):
+"""
+Recupera dados de vendas com base no product_code, store_code e date_range fornecidos.
+"""
+engine = create_engine(DATABASE_URI)
+
+query = f"""
+SELECT STORE_CODE, PRODUCT_CODE, DATE, SALES_VALUE, SALES_QTY
+FROM data_product_sales
+WHERE PRODUCT_CODE = {product_code}
+AND STORE_CODE = {store_code}
+AND DATE BETWEEN '{date_range[0]}' E '{date_range[1]}';
+"""
+
+com engine.connect() como conexão:
+df = pd.read_sql(query, connection)
+
+return df
+```
 
 
-<details>
- <summary><b> We are in need of this visualization (click here to see it)! Please, create it with Python</b></summary>
-  
-| Loja           | Categoria   | TM    | 
-|----------------|-------------|-------| 
-| Bahia          | Atacado     | 15.39 | 
-| Bangkok        | Posto       | 13.67 | 
-| Belem          | Proximidade | 15.37 | 
-| Berlin         | Proximidade | 15.39 | 
-| Buenos Aires   | Atacado     | 15.39 | 
-| Chicago        | Varejo      | 15.53 | 
-| Dubai          | Atacado     | 15.39 | 
-| Hong Kong      | Farma       | 26.35 | 
-| London         | Farma       | 28.99 | 
-| Madri          | Farma       | 29.03 | 
-| Miami          | Posto       | 13.67 | 
-| New York       | Proximidade | 15.39 | 
-| Paris          | Proximidade | 15.39 | 
-| Rio de Janeiro | Farma       | 29.59 | 
-| Roma           | Varejo      | 15.39 | 
-| Salvador       | Atacado     | 15.39 | 
-| Sao Paulo      | Varejo      | 15.39 | 
-| Sidney         | Posto       | 13.67 | 
-| Tokio          | Varejo      | 15.39 | 
-| Vancouver      | Posto       | 13.67 | 
-  
-</details>
+### 3. Ticket Médio
+Gerei um código em python que trata o retorno dado pelo banco de dados
 
-#### 3) Building your own visualization
+```python
+    with engine.connect() as connection:
+        df_store_cad = pd.read_sql(query1, connection)
+        df_store_sales = pd.read_sql(query2, connection)
 
-Create at least one chart using the table **IMDB_movies**. The code must be in Python, and you are free to use any libraries, data in the table and graphic format. Explain why you chose the visualization (or visualizations) you are submitting.
+    # Converte a coluna 'DATE' para o formato datetime
+    df_store_sales['DATE'] = pd.to_datetime(df_store_sales['DATE'])
 
-## Stack
-- MySQL database 
-- Python
+    # Filtra as vendas entre '2019-10-01' e '2019-12-31'
+    df_store_sales_filtered = df_store_sales[
+        (df_store_sales['DATE'] >= '2019-10-01') &
+        (df_store_sales['DATE'] <= '2019-12-31')
+    ].copy()  # Aqui usamos .copy() para criar uma cópia explícita
 
-## Submitting
-- Send an e-mail to the person that you are in contact within Looqbox!
-- Your answer must be sent in PDF format with the code snippets used in each question, as well as the result obtained (values, tables, graphs)
+    # Calcula o Ticket Médio (SALES_VALUE / SALES_QTY) por loja, usando .loc[] para evitar o alerta
+    df_store_sales_filtered.loc[:, 'TM'] = df_store_sales_filtered['SALES_VALUE'] / df_store_sales_filtered['SALES_QTY']
 
-## Useful links
-- [MySQL documentation](https://dev.mysql.com/doc/)
-- [Data Visualization Catalogue](https://datavizcatalogue.com/)
+    # Arredonda o Ticket Médio (TM) para 2 casas decimais
+    df_store_sales_filtered['TM'] = df_store_sales_filtered['TM'].round(2)
+
+    # Agrupa os dados por STORE_CODE e calcula a média do TM por loja
+    df_ticket_medio = df_store_sales_filtered.groupby('STORE_CODE').agg({'TM': 'mean'}).reset_index()
+
+    # Junta os dados de lojas com o Ticket Médio
+    df_resultado = pd.merge(df_store_cad, df_ticket_medio, on='STORE_CODE', how='inner')
+
+    # Seleciona as colunas desejadas e retorna o resultado final
+    df_resultado_final = df_resultado[['STORE_NAME', 'BUSINESS_NAME', 'TM']]
+
+    return df_resultado_final
+
+```
+
+### 4. Visualização: IMDB_movies
+
+Gerei um gráfico de dispersão que mostra a relação entre o número de votos que um filme recebeu e sua classificação, com o ano de lançamento representado por cor.
+
+```python
+def visualizar_imdb_movies():
+    """
+    Função que gera um gráfico de dispersão (scatter plot) para a tabela IMDB_movies,
+    relacionando a avaliação dos filmes (rating) com a quantidade de votos (votes),
+    e utilizando o ano de lançamento como uma variável de cor.
+
+    A função realiza os seguintes passos:
+    1. Consulta a tabela IMDB_movies.
+    2. Gera um gráfico de dispersão usando 'rating' no eixo Y e 'votes' no eixo X.
+    3. A cor dos pontos representa o ano de lançamento dos filmes.
+    4. Exibe o gráfico.
+    """
+
+    # Cria o engine para conectar ao banco de dados
+    engine = create_engine(DATABASE_URI)
+
+    # Consulta a tabela IMDB_movies
+    query = """
+    SELECT
+        title,
+        rating,
+        votes,
+        year
+    FROM IMDB_movies
+    """
+    
+    # Conectando e carregando os dados em um DataFrame
+    with engine.connect() as connection:
+        df_imdb = pd.read_sql(query, connection)
+
+    # Configurando o estilo do gráfico
+    plt.figure(figsize=(10, 6))
+    sns.set(style="whitegrid")
+
+    # Criando o gráfico de dispersão (scatter plot)
+    scatter = sns.scatterplot(
+        x='votes', 
+        y='rating', 
+        hue='year', 
+        palette='viridis', 
+        data=df_imdb, 
+        size='votes', 
+        sizes=(40, 400), 
+        alpha=0.7, 
+        edgecolor=None
+    )
+
+    # Adicionando títulos e rótulos
+    scatter.set_title("Relação entre Avaliação (Rating) e Votos (Votes) dos Filmes")
+    scatter.set_xlabel("Quantidade de Votos")
+    scatter.set_ylabel("Avaliação Média (Rating)")
+
+    # Exibindo o gráfico
+    plt.show()
+```
+
+---
+
+## Conclusão
+
+Este desafio demonstrou o uso de SQL para consultar dados, Python para desenvolver funções dinâmicas para recuperar informações específicas e técnicas de visualização de dados para apresentar insights graficamente.
