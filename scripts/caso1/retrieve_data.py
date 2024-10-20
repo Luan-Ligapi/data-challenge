@@ -1,4 +1,4 @@
-import mysql.connector
+from sqlalchemy import create_engine
 import pandas as pd
 
 def retrieve_data(product_code, store_code, date_range):
@@ -15,15 +15,8 @@ def retrieve_data(product_code, store_code, date_range):
     - pandas.DataFrame: DataFrame contendo os dados recuperados da consulta.
     """
     
-    # Conectando ao banco de dados
-    connection = mysql.connector.connect(
-        host="35.199.115.174",  # O IP do servidor
-        port=3306,              # Especificando a porta do MySQL
-        user="looqbox-challenge",  # Usuário MySQL
-        password="looq-challenge",  # Senha MySQL
-        database="looqbox-challenge",            # Deixe vazio conforme configurado no DBeaver
-        ssl_disabled=True       # Desativando SSL se não for necessário
-    )
+    # Criar a conexão com SQLAlchemy usando o driver MySQL
+    engine = create_engine('mysql+mysqlconnector://looqbox-challenge:looq-challenge@35.199.115.174:3306/looqbox-challenge')
     
     # Montando a consulta SQL dinâmica
     query = f"""
@@ -35,10 +28,7 @@ def retrieve_data(product_code, store_code, date_range):
     """
     
     # Executando a consulta e convertendo os resultados para um DataFrame
-    df = pd.read_sql(query, connection)
-    
-    # Fechando a conexão
-    connection.close()
+    df = pd.read_sql(query, engine)
     
     return df
 

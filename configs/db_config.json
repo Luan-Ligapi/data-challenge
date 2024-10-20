@@ -1,0 +1,8 @@
+{
+    "host": "35.199.115.174",
+    "port": 3306,
+    "user": "looqbox-challenge",
+    "password": "looq-challenge",
+    "database": "looqbox-challenge"
+  }
+  

@@ -1,7 +1,11 @@
 import unittest
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Adiciona o caminho da pasta 'scripts' ao sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+# Agora tente importar o módulo
 from scripts.caso1.retrieve_data import retrieve_data
 import pandas as pd
 
